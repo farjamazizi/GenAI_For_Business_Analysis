@@ -1,0 +1,118 @@
+Metadata-Version: 2.4
+Name: genai-business-analysis
+Version: 0.1.0
+Summary: Production-oriented backend and frontend scaffold for business analysis fine-tuning workflows.
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi<1.0.0,>=0.115.0
+Requires-Dist: openai<2.0.0,>=1.30.0
+Requires-Dist: pydantic<3.0.0,>=2.7.0
+Requires-Dist: pydantic-settings<3.0.0,>=2.2.1
+Requires-Dist: python-dotenv<2.0.0,>=1.0.1
+Requires-Dist: python-multipart<1.0.0,>=0.0.9
+Requires-Dist: uvicorn[standard]<1.0.0,>=0.30.0
+Provides-Extra: dev
+Requires-Dist: httpx<1.0.0,>=0.27.0; extra == "dev"
+Requires-Dist: pytest<9.0.0,>=8.0.0; extra == "dev"
+
+# GenAI For Business Analysis
+
+Built a notebook-based GenAI workflow in Python to transform customer support and complaint data into OpenAI chat-training format, fine-tune a model for structured complaint-information extraction, compare outputs against a general model, and visualize training performance using loss and token-accuracy metrics.
+
+This repository now has a production-oriented full-stack scaffold that turns your notebooks into a maintainable application:
+
+- A Python backend package for dataset preparation, fine-tuning, and monitoring
+- A FastAPI layer that exposes those workflows as HTTP endpoints
+- A React frontend that walks through the same steps as the notebooks
+
+## Step-by-Step Migration
+
+### Step 1: Set up the Python backend
+
+Create and activate a virtual environment, then install the project in editable mode:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+```
+
+Create a local `.env` file from the example:
+
+```bash
+cp .env.example .env
+```
+
+Add your `OPENAI_API_KEY` and, if needed, `OPENAI_ORG_ID`.
+
+### Step 2: Start the backend API
+
+Run the FastAPI server:
+
+```bash
+uvicorn business_analysis_ai.api.main:app --reload --app-dir backend/src
+```
+
+The backend gives you these main routes:
+
+- `POST /api/datasets/convert`
+- `POST /api/fine-tuning/jobs`
+- `GET /api/fine-tuning/jobs/latest`
+- `GET /api/fine-tuning/jobs/{job_id}`
+- `GET /api/fine-tuning/jobs/{job_id}/metrics`
+
+### Step 3: Start the React frontend
+
+Install frontend dependencies and run the dev server:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+If you want the frontend to call a different backend URL, add `VITE_API_BASE_URL` to `frontend/.env`.
+
+### Step 4: Map notebook logic into the module
+
+The original notebook flows now live here:
+
+- Dataset preparation: `backend/src/business_analysis_ai/services/datasets.py`
+- Fine-tuning job creation: `backend/src/business_analysis_ai/services/fine_tuning.py`
+- Training metrics extraction: `backend/src/business_analysis_ai/services/monitoring.py`
+- API layer: `backend/src/business_analysis_ai/api/main.py`
+
+### Step 5: Run tests
+
+```bash
+pytest
+```
+
+## Recommended Next Steps
+
+This first migration pass gives you the structure. The next production steps are:
+
+1. Move secrets out of `apikey.env.txt` and into `.env` or a secret manager.
+2. Add persistent storage for job history instead of relying only on the OpenAI account state.
+3. Replace raw metric JSON in the frontend with charts.
+4. Add request logging, authentication, and deployment configuration.
+
+## Project Structure
+
+```text
+.
+├── backend/
+│   ├── src/business_analysis_ai/
+│   │   ├── api/main.py
+│   │   ├── config.py
+│   │   ├── schemas.py
+│   │   └── services/
+│   └── tests/
+├── frontend/
+│   ├── src/
+│   └── package.json
+├── artifacts/
+├── Customer Complaints.csv
+├── pyproject.toml
+└── README.md
+```

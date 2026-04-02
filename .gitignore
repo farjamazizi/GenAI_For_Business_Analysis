@@ -1,0 +1,15 @@
+.venv/
+.codex
+__pycache__/
+.pytest_cache/
+*.pyc
+*.pyo
+*.pyd
+.env
+backend/.env
+apikey.env.txt
+frontend/node_modules/
+frontend/dist/
+artifacts/
+training_data.jsonl
+*.log
